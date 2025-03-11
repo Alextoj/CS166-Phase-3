@@ -287,17 +287,17 @@ public class PizzaStore {
                 System.out.println(".........................");
                 System.out.println("20. Log out");
                 switch (readChoice()){
-                   case 1: viewProfile(esql); break;
-                   case 2: updateProfile(esql); break;
+                   case 1: viewProfile(esql, authorisedUser); break;
+                   case 2: updateProfile(esql, authorisedUser); break;
                    case 3: viewMenu(esql); break;
                    case 4: placeOrder(esql); break;
-                   case 5: viewAllOrders(esql); break;
-                   case 6: viewRecentOrders(esql); break;
-                   case 7: viewOrderInfo(esql); break;
+                   case 5: viewAllOrders(esql, authorisedUser); break;
+                   case 6: viewRecentOrders(esql, authorisedUser); break;
+                   case 7: viewOrderInfo(esql, authorisedUser); break;
                    case 8: viewStores(esql); break;
-                   case 9: updateOrderStatus(esql); break;
-                   case 10: updateMenu(esql); break;
-                   case 11: updateUser(esql); break;
+                   case 9: updateOrderStatus(esql, authorisedUser); break;
+                   case 10: updateMenu(esql, authorisedUser); break;
+                   case 11: updateUser(esql, authorisedUser); break;
 
 
 
@@ -354,6 +354,20 @@ public class PizzaStore {
     * Creates a new user
     **/
    public static void CreateUser(PizzaStore esql){
+      try {
+         System.out.print("Enter user login: ");
+         String login = in.readLine();
+         System.out.print("Enter password: ");
+         String password = in.readLine();
+         System.out.print("Enter phone number: ");
+         String phone = in.readLine();
+         
+         String query = "INSERT INTO Users (login, password, phoneNum) VALUES ('" + login + "', '" + password + "', '" + phone + "');";
+         esql.executeUpdate(query);
+         System.out.println("User successfully created!");
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
    }//end CreateUser
 
 
@@ -362,19 +376,81 @@ public class PizzaStore {
     * @return User login or null is the user does not exist
     **/
    public static String LogIn(PizzaStore esql){
-      return null;
+      try {
+         System.out.print("Enter user login: ");
+         String login = in.readLine();
+         System.out.print("Enter password: ");
+         String password = in.readLine();
+         
+         String query = "SELECT * FROM Users WHERE login='" + login + "' AND password='" + password + "';";
+         int userNum = esql.executeQuery(query);
+         
+         if (userNum > 0) {
+            System.out.println("Login successful!");
+            return login;
+         } else {
+            System.out.println("Invalid login credentials.");
+            return null;
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+         return null;
+      }
    }//end
 
 // Rest of the functions definition go in here
 
-   public static void viewProfile(PizzaStore esql) {}
-   public static void updateProfile(PizzaStore esql) {}
+   public static void viewProfile(PizzaStore esql, String Login) {
+      try {
+         String query = "SELECT role, favoriteItems, PhoneNum FROM Users WHERE login ='" + Login +"';";
+         int rowCount = esql.executeQuery(query);
+         System.out.println ("total row(s): " + rowCount);
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+   public static void updateProfile(PizzaStore esql) {
+      
+   }
    public static void viewMenu(PizzaStore esql) {}
    public static void placeOrder(PizzaStore esql) {}
-   public static void viewAllOrders(PizzaStore esql) {}
-   public static void viewRecentOrders(PizzaStore esql) {}
-   public static void viewOrderInfo(PizzaStore esql) {}
-   public static void viewStores(PizzaStore esql) {}
+   public static void viewAllOrders(PizzaStore esql, String Login) {
+      try {
+         String query = "SELECT * FROM FoodOrder WHERE login ='" + Login + "';";
+         int rowCount = esql.executeQuery(query);
+         System.out.println ("total row(s): " + rowCount);
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+   public static void viewRecentOrders(PizzaStore esql, String Login) {
+      try {
+         String query = "SELECT * ROW NUMBER() OVER (ORDER BY orderTimestamp DESC) rn FROM FoodOrder WHERE rn <= 5 AND login = '" + Login + "';";
+         int rowCount = esql.executeQuery(query);
+         System.out.println ("total row(s): " + rowCount);
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+   public static void viewOrderInfo(PizzaStore esql, String Login) {
+      try {
+         String query = "SELECT * FROM FoodOrder WHERE login ='" + Login + "';";
+         esql.executeQueryAndPrintResult(query);
+         int rowCount = esql.executeQuery(query);
+         System.out.println ("total row(s): " + rowCount);
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+   public static void viewStores(PizzaStore esql) {
+      try {
+         String query = "SELECT * FROM Store;";
+         int rowCount = esql.executeQuery(query);
+         System.out.println ("total row(s): " + rowCount);
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
    public static void updateOrderStatus(PizzaStore esql) {}
    public static void updateMenu(PizzaStore esql) {}
    public static void updateUser(PizzaStore esql) {}
