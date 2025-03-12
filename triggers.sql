@@ -1,0 +1,19 @@
+DROP SEQUENCE IF EXISTS orderID_Seq;
+
+DROP TRIGGER IF EXISTS orderID_trigger ON FoodOrder;
+
+DROP FUNCTION IF EXISTS generateOrderID();
+
+CREATE SEQUENCE orderID_Seq START 10004; -- Previous Order ends on 10003
+
+CREATE OR REPLACE FUNCTION generateOrderID() RETURNS TRIGGER AS $$
+BEGIN
+  NEW.orderID := nextval('orderID_Seq');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER orderID_trigger
+BEFORE INSERT ON FoodOrder
+FOR EACH ROW
+EXECUTE PROCEDURE generateOrderID();
